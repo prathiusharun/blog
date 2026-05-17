@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Fonts ──────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Lora', Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+/* ── Base ───────────────────────────────────────────────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-size: 17px;
+  }
+
+  body {
+    @apply bg-paper text-ink transition-colors duration-300;
+    font-family: var(--font-body);
+  }
+
+  .dark body {
+    @apply bg-void text-[#D4CFC8];
+  }
+
+  ::selection {
+    @apply bg-accent/30 text-ink;
+  }
+
+  .dark ::selection {
+    @apply bg-accent/40 text-paper;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-paper-muted dark:bg-void-muted; }
+  ::-webkit-scrollbar-thumb { @apply bg-accent/60 rounded-full; }
+}
+
+/* ── Components ─────────────────────────────────────────── */
+@layer components {
+  .nav-link {
+    @apply font-mono text-sm uppercase tracking-widest text-ink-muted hover:text-accent transition-colors duration-200;
+  }
+
+  .dark .nav-link {
+    @apply text-[#8A8A85] hover:text-accent;
+  }
+
+  .tag {
+    @apply inline-block font-mono text-xs uppercase tracking-wider px-2 py-0.5
+           border border-ink-faint/40 text-ink-faint
+           hover:border-accent hover:text-accent
+           transition-colors duration-200 cursor-pointer;
+  }
+
+  .dark .tag {
+    @apply border-void-border text-[#8A8A85] hover:border-accent hover:text-accent;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-5 py-2.5
+           bg-accent text-void font-mono text-sm font-medium uppercase tracking-wider
+           hover:bg-accent-dark transition-colors duration-200;
+  }
+
+  .card {
+    @apply bg-paper-muted border border-paper-dark dark:bg-void-surface dark:border-void-border
+           transition-colors duration-300;
+  }
+
+  /* Code blocks */
+  pre {
+    @apply rounded-none border-l-2 border-accent bg-paper-muted dark:bg-void-surface
+           p-5 overflow-x-auto text-sm;
+  }
+
+  pre code {
+    @apply bg-transparent p-0 text-inherit;
+  }
+
+  /* Ad slot styling */
+  .ad-slot {
+    @apply w-full min-h-[90px] bg-paper-muted dark:bg-void-surface
+           border border-dashed border-ink-faint/30 dark:border-void-border
+           flex items-center justify-center
+           font-mono text-xs text-ink-faint dark:text-[#8A8A85] uppercase tracking-widest;
+  }
+}
+
+/* ── Animations ─────────────────────────────────────────── */
+@layer utilities {
+  .animate-delay-100 { animation-delay: 100ms; }
+  .animate-delay-200 { animation-delay: 200ms; }
+  .animate-delay-300 { animation-delay: 300ms; }
+  .animate-delay-400 { animation-delay: 400ms; }
+
+  .opacity-0-start { opacity: 0; }
+}
+
+/* ── Prose overrides ────────────────────────────────────── */
+.prose {
+  font-family: var(--font-body);
+}
+
+.prose h1, .prose h2, .prose h3 {
+  font-family: var(--font-display);
+}
+
+.prose code {
+  font-family: var(--font-mono);
+}
+
+/* Highlight.js dark theme for code */
+.dark .hljs {
+  background: #1C1C1F;
+  color: #D4CFC8;
+}

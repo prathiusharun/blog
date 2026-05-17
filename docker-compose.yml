@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  blog:
+    build:
+      context: .
+      target: builder          # Use builder stage for dev (has devDeps)
+    command: npm run dev
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app                 # Mount source for hot reload
+      - /app/node_modules      # Prevent overwriting node_modules
+      - /app/.next             # Preserve Next.js build cache
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_SITE_URL=http://localhost:3000
+      # Set NEXT_PUBLIC_ADSENSE_ID to enable ads in dev
+    restart: unless-stopped
+
+  # Optional: Nginx reverse proxy (mirrors production)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - '80:80'
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - blog
+    profiles:
+      - proxy    # Only starts with: docker compose --profile proxy up
+
+volumes: {}

@@ -1,0 +1,49 @@
+---
+title: "Why I Chose Next.js for My Blog (And Why You Might Too)"
+description: "After evaluating Astro, Gatsby, and plain HTML — here's why Next.js App Router won for a developer blog in 2024."
+date: "2024-08-15"
+tags: ["Next.js", "React", "architecture"]
+---
+
+When you're building a personal blog as a developer, you face a deceptively hard decision. The tech you pick says something about you to every developer and peer who reads your `package.json`. Let me walk you through exactly how I thought about it.
+
+## The Contenders
+
+I spent a weekend seriously evaluating three options:
+
+- **Astro** — blazing fast, islands architecture, great DX
+- **Gatsby** — battle-tested, rich plugin ecosystem, but feels heavy
+- **Next.js 14 App Router** — familiar React, RSC, edge-ready
+
+## Why Next.js Won
+
+### Server Components are a superpower
+
+With React Server Components, my MDX parsing, file-system reads, and frontmatter extraction all happen **at build time on the server** — zero JavaScript sent to the client for those operations. The result: a blog that feels instant.
+
+```typescript
+// This runs only on the server — never ships to the browser
+export async function getAllPosts(): Promise<Post[]> {
+  const slugs = getPostSlugs()
+  return slugs
+    .map(getPostBySlug)
+    .filter((p): p is Post => p !== null && !p.draft)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+}
+```
+
+### `output: 'standalone'` for Docker
+
+Next.js 14 produces a minimal standalone output that copies only what it needs into a Docker image. Combined with multi-stage builds, my final image is under 200MB.
+
+### The ecosystem depth matters
+
+When I eventually add comments, search, or a newsletter — there are battle-tested solutions that integrate cleanly with Next.js. With Astro, I'd be piecing things together more manually.
+
+## The Trade-off I Accepted
+
+Next.js is more opinionated and has more client-side JavaScript than Astro for a static blog. For a pure content site, Astro wins on raw performance metrics. But I'm a React developer — my blog is also a portfolio of my thinking. Using what I know deeply matters.
+
+## Final Verdict
+
+Pick the tool you can ship in. Shipping a polished blog on React beats a half-finished Astro project every time.

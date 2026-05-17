@@ -1,0 +1,75 @@
+---
+title: "Dockerizing a Next.js App the Right Way"
+description: "Multi-stage builds, standalone output, non-root users, and health checks — a production Docker setup for Next.js that won't embarrass you."
+date: "2024-09-20"
+tags: ["Docker", "Next.js", "DevOps"]
+---
+
+Most Docker tutorials for Next.js are fine for learning but would raise eyebrows in a production code review. Here's the setup I use and why each decision was made.
+
+## The Goals
+
+- Final image under 200MB
+- Non-root user (security)
+- Proper layer caching (fast rebuilds)
+- Health check endpoint
+- Works with `next start` in production mode
+
+## Multi-Stage Dockerfile
+
+```dockerfile
+# Stage 1: deps
+FROM node:20-alpine AS deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --frozen-lockfile
+
+# Stage 2: builder
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run build
+
+# Stage 3: runner
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+EXPOSE 3000
+ENV PORT=3000
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+  CMD wget -qO- http://localhost:3000/api/health || exit 1
+
+CMD ["node", "server.js"]
+```
+
+## Why Alpine?
+
+The `node:20-alpine` base is ~50MB vs ~900MB for the full Debian image. For a Node.js app that doesn't need OS-level packages, Alpine is the right call.
+
+## Why `npm ci` Instead of `npm install`?
+
+`npm ci` reads `package-lock.json` exactly and fails loudly if it doesn't match `package.json`. This means your CI and your local build always produce identical `node_modules`.
+
+## The Non-Root User Pattern
+
+Running as root inside containers is a security anti-pattern. If your app is compromised, root in the container can mean root-level damage on the host (especially without user namespace remapping). Always create a dedicated user.
+
+## Layer Caching Strategy
+
+Notice `COPY package.json package-lock.json ./` before `COPY . .` — this means Docker only re-runs `npm ci` when your dependencies change, not every code change. A build that used to take 3 minutes drops to 20 seconds on code-only changes.
+
+## Health Check
+
+The `/api/health` endpoint returns `{ status: "ok" }`. Docker uses this to know when your container is truly ready — not just that the process started, but that it's serving traffic.
+
+This is what separates a container that just runs from one that's production-observable.

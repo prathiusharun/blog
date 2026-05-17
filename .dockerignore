@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.github
+.env
+.env.local
+.env*.local
+npm-debug.log*
+README.md
+*.md
+!src/content/**/*.md
+!src/content/**/*.mdx
+.DS_Store
+Thumbs.db
+nginx
