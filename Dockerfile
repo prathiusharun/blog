@@ -12,7 +12,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Reproducible, exact install
-RUN npm ci --frozen-lockfile
+RUN npm ci --legacy-peer-deps
 
 # ─────────────────────────────────────────────────────────────
 # Stage 2: Build the application
