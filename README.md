@@ -180,6 +180,4 @@ mkdir -p /opt/prathiush-blog
 
 ---
 
-## 📜 License
 
-MIT — do whatever you want with it.
