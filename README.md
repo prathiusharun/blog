@@ -1,42 +1,86 @@
-# Prathiush.dev — Personal Developer Blog
+# Prathiush.dev
 
-A production-grade personal blog built with Next.js 14 App Router, TypeScript, Tailwind CSS, and MDX. Features dark/light mode, Google AdSense integration, Docker, and GitHub Actions CI/CD.
+A production-grade personal blog built with Next.js 14 App Router, TypeScript, Tailwind CSS, and MDX. Designed as a complete content platform — not just a blog template — with SEO, monetization, containerization, and a full CI/CD pipeline.
 
 ---
 
-## ✨ Features
+## Architecture
 
-- **MDX blog posts** — write in Markdown with JSX components
-- **Dark / Light mode** — system preference + manual toggle via `next-themes`
-- **Google AdSense** — env-gated ad slots, dev placeholder shown when ID is missing
-- **SEO** — Open Graph, Twitter cards, sitemap, robots.txt, RSS feed
-- **Reading time** — calculated per post
-- **Tags** — tag index and filtered tag pages
-- **Docker** — multi-stage build with non-root user, health check
+```mermaid
+flowchart TD
+    subgraph Client["Client"]
+        A[Browser]
+    end
+
+    subgraph App["Next.js 14 — App Router"]
+        B[Static Pages / ISR]
+        C[MDX Renderer]
+        D[AdSlot Component]
+        E[Theme Provider]
+    end
+
+    subgraph Content["Content Layer"]
+        F[MDX Posts]
+        G[Sitemap / RSS / robots.txt]
+    end
+
+    subgraph Infra["Production Infrastructure"]
+        H[Nginx Reverse Proxy]
+        I[Docker Container]
+    end
+
+    subgraph Pipeline["CI/CD — GitHub Actions"]
+        J[Lint + Type Check + Test]
+        K[Docker Build & Push]
+        L[SSH Deploy]
+    end
+
+    subgraph External["External Services"]
+        M[Google AdSense]
+        N[GitHub Container Registry]
+    end
+
+    A --> B
+    B --> C
+    C --> F
+    B --> G
+    B --> D
+    D --> M
+    B --> E
+
+    J --> K --> N
+    K --> L --> H
+    H --> I
+    N -->|pull image| I
+```
+
+---
+
+## Features
+
+- **MDX authoring** — write posts in Markdown with full JSX component support
+- **Dark / Light mode** — system preference detection + manual toggle via `next-themes`
+- **Google AdSense** — env-gated ad slots; dev placeholders render when publisher ID is absent
+- **SEO** — Open Graph, Twitter cards, XML sitemap, `robots.txt`, RSS feed
+- **Reading time** — computed per post at build time
+- **Tags** — tag index page and filtered tag views
+- **Docker** — multi-stage build, non-root user, health check endpoint
 - **CI/CD** — GitHub Actions: lint → type-check → test → Docker push → SSH deploy
 
 ---
 
-## 🚀 Quick Start (Local)
+## Quick Start
 
 ```bash
-# 1. Clone
-git clone https://github.com/YOUR_USERNAME/prathiush-blog.git
-cd prathiush-blog
-
-# 2. Install
+git clone https://github.com/prathiusharun/blog.git
+cd blog
 npm install
-
-# 3. Configure env
 cp .env.example .env.local
-# Edit .env.local — set NEXT_PUBLIC_SITE_URL=http://localhost:3000
-
-# 4. Dev server
+# Set NEXT_PUBLIC_SITE_URL=http://localhost:3000
 npm run dev
-# → http://localhost:3000
 ```
 
-### Docker (local)
+**Docker (local)**
 
 ```bash
 docker compose up --build
@@ -44,47 +88,45 @@ docker compose up --build
 
 ---
 
-## ✍️ Writing Posts
+## Writing Posts
 
-Create a `.mdx` file in `src/content/posts/`:
+Create a `.mdx` file under `src/content/posts/`:
 
 ```mdx
 ---
 title: "My Post Title"
-description: "A short description for SEO and post cards."
+description: "Short description for SEO and post cards."
 date: "2024-10-01"
 tags: ["Next.js", "TypeScript"]
 draft: false
 ---
 
-Your content here. Full **Markdown** + JSX supported.
-
-```ts
-const hello = "world"
-```
+Your content here. Full **Markdown** and JSX supported.
 ```
 
-Posts are automatically picked up, sorted by date, and statically generated at build time.
+Posts are automatically discovered, sorted by date, and statically generated at build time. Setting `draft: true` excludes a post from production builds.
 
 ---
 
-## 💰 Monetization (Google AdSense)
+## Monetization
 
 1. Get your publisher ID from [Google AdSense](https://adsense.google.com) — format: `ca-pub-XXXXXXXXXXXXXXXX`
-2. Set in `.env.local`:
-   ```
-   NEXT_PUBLIC_ADSENSE_ID=ca-pub-XXXXXXXXXXXXXXXX
-   ```
-3. Update ad slot IDs in `src/app/page.tsx` and `src/app/posts/[slug]/page.tsx` with your real slot IDs from AdSense dashboard
-4. Add `adsbygoogle.js` loads automatically via `src/app/layout.tsx`
+2. Add to `.env.local`:
 
-In development (no ID set), placeholder boxes show where ads will appear.
+```env
+NEXT_PUBLIC_ADSENSE_ID=ca-pub-XXXXXXXXXXXXXXXX
+```
+
+3. Replace placeholder slot IDs in `src/app/page.tsx` and `src/app/posts/[slug]/page.tsx` with real slot IDs from your AdSense dashboard
+4. The `adsbygoogle.js` script loads automatically via `src/app/layout.tsx`
+
+In development, placeholder boxes are rendered wherever ad slots appear.
 
 ---
 
-## 🐳 Docker
+## Docker
 
-### Build production image
+**Build**
 
 ```bash
 docker build \
@@ -92,7 +134,7 @@ docker build \
   -t prathiush-blog:latest .
 ```
 
-### Run production image
+**Run**
 
 ```bash
 docker run -p 3000:3000 \
@@ -100,7 +142,7 @@ docker run -p 3000:3000 \
   prathiush-blog:latest
 ```
 
-### Docker Compose (production)
+**Production Compose**
 
 ```bash
 IMAGE_TAG=latest \
@@ -110,74 +152,77 @@ docker compose -f docker-compose.prod.yml up -d
 
 ---
 
-## ⚙️ CI/CD (GitHub Actions)
+## CI/CD
 
-The pipeline in `.github/workflows/ci-cd.yml` runs on every push to `main`:
+Every push to `main` triggers the full pipeline:
 
 | Step | What happens |
 |------|-------------|
-| **Quality** | `type-check` + `lint` + `test` |
-| **Build & Push** | Docker multi-platform image → GitHub Container Registry (GHCR) |
-| **Deploy** | SSH into your server, pull new image, zero-downtime restart |
+| Quality | `type-check` + `lint` + `test` |
+| Build & Push | Multi-platform Docker image → GitHub Container Registry |
+| Deploy | SSH into server, pull new image, zero-downtime restart |
 
-### Required GitHub Secrets
+**Required GitHub Secrets**
 
 | Secret | Description |
 |--------|-------------|
-| `NEXT_PUBLIC_SITE_URL` | Your production URL |
+| `NEXT_PUBLIC_SITE_URL` | Production URL |
 | `NEXT_PUBLIC_ADSENSE_ID` | AdSense publisher ID |
 | `DEPLOY_HOST` | Server IP or hostname |
 | `DEPLOY_USER` | SSH username |
-| `DEPLOY_SSH_KEY` | Private SSH key (add public key to server `~/.ssh/authorized_keys`) |
-
-### Server Setup (one-time)
-
-```bash
-# On your production server
-mkdir -p /opt/prathiush-blog
-# Copy docker-compose.prod.yml and nginx/ folder there
-# Install Docker + Docker Compose
-```
+| `DEPLOY_SSH_KEY` | Private SSH key |
 
 ---
 
-## 🗂 Project Structure
+## Project Structure
 
 ```
 ├── src/
-│   ├── app/                  # Next.js App Router pages
-│   │   ├── layout.tsx        # Root layout, theme provider
-│   │   ├── page.tsx          # Home page
-│   │   ├── about/            # About page
-│   │   ├── posts/[slug]/     # Individual post page
-│   │   ├── tags/             # Tag index + tag pages
-│   │   ├── api/health/       # Health check endpoint
-│   │   ├── rss.xml/          # RSS feed
-│   │   ├── robots.txt/       # robots.txt
-│   │   └── sitemap.ts        # XML sitemap
-│   ├── components/           # Shared components
-│   │   ├── Navbar.tsx        # Nav + dark mode toggle
+│   ├── app/
+│   │   ├── layout.tsx          # Root layout, theme provider
+│   │   ├── page.tsx            # Home page
+│   │   ├── about/              # About page
+│   │   ├── posts/[slug]/       # Individual post pages
+│   │   ├── tags/               # Tag index + filtered views
+│   │   ├── api/health/         # Health check endpoint
+│   │   ├── rss.xml/            # RSS feed
+│   │   ├── robots.txt/         # robots.txt
+│   │   └── sitemap.ts          # XML sitemap
+│   ├── components/
+│   │   ├── Navbar.tsx          # Navigation + theme toggle
 │   │   ├── Footer.tsx
 │   │   ├── PostCard.tsx
-│   │   └── AdSlot.tsx        # AdSense slot wrapper
+│   │   └── AdSlot.tsx          # AdSense slot wrapper
 │   ├── content/
-│   │   └── posts/            # ← Write your .mdx posts here
+│   │   └── posts/              # MDX posts live here
 │   ├── lib/
-│   │   ├── posts.ts          # File-system MDX utilities
-│   │   └── types.ts          # TypeScript types
+│   │   ├── posts.ts            # File-system MDX utilities
+│   │   └── types.ts            # Shared TypeScript types
 │   └── styles/
-│       └── globals.css       # Tailwind + custom CSS
+│       └── globals.css         # Tailwind + custom CSS
 ├── nginx/
-│   ├── nginx.prod.conf       # Production Nginx (HTTPS, rate limit)
-│   └── nginx.dev.conf        # Dev Nginx
+│   ├── nginx.prod.conf         # HTTPS, rate limiting
+│   └── nginx.dev.conf
 ├── .github/workflows/
-│   └── ci-cd.yml             # GitHub Actions pipeline
-├── Dockerfile                # Multi-stage production build
-├── docker-compose.yml        # Local dev
-├── docker-compose.prod.yml   # Production
+│   └── ci-cd.yml
+├── Dockerfile
+├── docker-compose.yml          # Local dev
+├── docker-compose.prod.yml     # Production
 └── .env.example
 ```
 
 ---
 
+## Tech Stack
 
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 14 App Router |
+| Language | TypeScript |
+| Styling | Tailwind CSS |
+| Content | MDX |
+| Containerization | Docker |
+| Reverse Proxy | Nginx |
+| CI/CD | GitHub Actions |
+| Registry | GitHub Container Registry |
+| Monetization | Google AdSense |
