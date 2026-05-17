@@ -4,7 +4,7 @@ import matter from 'gray-matter'
 import readingTime from 'reading-time'
 import type { Post, PostFrontmatter } from './types'
 
-const POSTS_DIR = path.join(process.cwd(), 'src/content/posts')
+const POSTS_DIR = path.join(process.cwd(), 'src', 'content', 'posts')
 
 export function getPostSlugs(): string[] {
   if (!fs.existsSync(POSTS_DIR)) return []

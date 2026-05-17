@@ -34,12 +34,11 @@ jobs:
       - name: Type check
         run: npm run type-check
 
-      - name: Lint
-        run: npm run lint
+        - name: Lint
+  run: npx eslint .
 
-      - name: Run tests
-        run: npm test
-
+- name: Run tests
+  run: npm test
   # ──────────────────────────────────────────────────────────
   # JOB 2 — Build & push Docker image (main branch only)
   # ──────────────────────────────────────────────────────────
