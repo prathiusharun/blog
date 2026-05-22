@@ -1,19 +1,15 @@
 import { MetadataRoute } from 'next'
 import { getAllPosts, getAllTags } from '@/lib/posts'
 
-export const dynamic = 'force-static'
-
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    'https://prathiush-portfolio.vercel.app'
+  const siteUrl = 'https://prathiush-portfolio.vercel.app'
 
   const posts = getAllPosts()
   const tags = getAllTags()
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: `${siteUrl}`,
+      url: `${siteUrl}/`,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1,
@@ -21,14 +17,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: `${siteUrl}/blog`,
       lastModified: new Date(),
-      changeFrequency: 'daily',
+      changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
       url: `${siteUrl}/about`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.6,
+      priority: 0.5,
     },
     {
       url: `${siteUrl}/tags`,
