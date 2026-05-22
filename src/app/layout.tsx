@@ -48,10 +48,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-screen flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </ThemeProvider>
+      <Navbar />
+      <main className="flex-1">{children}</main>
+      <Footer />
+    </ThemeProvider>
       </body>
     </html>
   )
