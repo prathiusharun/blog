@@ -225,4 +225,4 @@ Every push to `main` triggers the full pipeline:
 | Reverse Proxy | Nginx |
 | CI/CD | GitHub Actions |
 | Registry | GitHub Container Registry |
-| Monetization | Google AdSense |
+| Monetization | Google AdSense |// force redeploy
