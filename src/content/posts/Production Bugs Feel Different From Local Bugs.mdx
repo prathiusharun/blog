@@ -1,0 +1,69 @@
+---
+
+title: "Production Bugs Feel Different From Local Bugs"
+description: "A small Next.js deployment issue taught me that modern frameworks maintain hidden system state beyond your source code."
+date: "2026-05-23"
+tags: ["Next.js", "debugging", "Vercel", "systems"]
+---------------------------------------------------
+
+# Production Bugs Feel Different From Local Bugs
+
+I recently hit a strange Next.js deployment issue on Vercel:
+
+`route.ts is not a module`
+
+The confusing part was that the code itself was correct.
+
+Everything worked locally.
+
+The problem turned out to be stale generated state inside `.next`.
+
+Deleting `.next` fixed the entire build instantly.
+
+## Why This Felt So Weird
+
+At first this feels irrational:
+
+“How can deleting a folder magically fix production?”
+
+But modern frameworks like Next.js generate hidden build artifacts, cached type state, compiled routes, dependency graphs, and intermediate outputs.
+
+Your source code is not the only thing the framework uses to reason about the application.
+
+The framework also reasons about generated state created during previous builds.
+
+That means the compiler can sometimes react to an older internal reality instead of the current source code.
+
+## What Changed in My Thinking
+
+This changed how I think about debugging.
+
+Local bugs are usually easier because:
+
+* environment is stable
+* cache state is predictable
+* build history is smaller
+* execution path is simpler
+
+Production systems are different.
+
+Now there are:
+
+* deployment pipelines
+* generated artifacts
+* framework caches
+* environment differences
+* stale build state
+* infrastructure behavior
+
+## The Real Lesson
+
+The important lesson was not:
+
+“delete `.next`”
+
+The real lesson was:
+
+modern frameworks maintain hidden system state.
+
+And sometimes debugging means fixing the system around the code, not the code itself.
