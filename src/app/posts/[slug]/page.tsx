@@ -3,17 +3,13 @@ import type { Metadata } from 'next'
 import { getAllPosts, getPostBySlug } from '@/lib/posts'
 import { format } from 'date-fns'
 import Link from 'next/link'
-import { AdSlot } from '@/components/AdSlot'
-import path from 'path'
 
 interface Params {
   slug: string
 }
 
 export async function generateStaticParams() {
-  const posts = getAllPosts()
-  if (!posts || posts.length === 0) return []
-  return posts
+  return getAllPosts()
     .filter((post) => post?.slug)
     .map((post) => ({ slug: post.slug }))
 }
@@ -25,7 +21,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   const post = getPostBySlug(slug)
+
   if (!post) return {}
+
   return {
     title: post.title,
     description: post.description,
@@ -46,9 +44,11 @@ export default async function PostPage({
 }) {
   const { slug } = await params
   const post = getPostBySlug(slug)
+
   if (!post) notFound()
 
   let MDXContent
+
   try {
     const mdxModule = await import(`@/content/posts/${slug}.mdx`)
     MDXContent = mdxModule.default
@@ -57,76 +57,75 @@ export default async function PostPage({
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-16">
-      <Link
-        href="/"
-        className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-ink-faint dark:text-[#6A6A65] hover:text-accent dark:hover:text-accent mb-12 transition-colors"
-      >
-        ← Back
-      </Link>
+    <article>
+      <header className="site-container pt-12 pb-16 md:pt-16 md:pb-20">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[var(--ink-muted)] transition-colors hover:text-[var(--blue-deep)]"
+        >
+          <span aria-hidden="true">←</span>
+          Back to writing
+        </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-16">
-        <article>
-          <header className="mb-10 animate-fade-up">
-            <div className="flex flex-wrap gap-2 mb-4">
-              {post.tags?.map((tag) => (
-                <Link key={tag} href={`/tags/${tag}`} className="tag">
-                  {tag}
-                </Link>
-              ))}
-            </div>
-            <h1
-              className="font-display font-black text-4xl md:text-5xl text-ink dark:text-[#F5F0E8] leading-[1.1] mb-4"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              {post.title}
-            </h1>
-            <p className="text-ink-muted dark:text-[#8A8A85] text-lg leading-relaxed mb-6 max-w-2xl">
-              {post.description}
-            </p>
-            <div className="flex flex-wrap items-center gap-4 font-mono text-xs uppercase tracking-widest text-ink-faint dark:text-[#6A6A65] pb-8 border-b border-paper-dark dark:border-void-border">
-              <time dateTime={post.date}>
-                {format(new Date(post.date), 'MMMM d, yyyy')}
-              </time>
-              <span>·</span>
-              <span>{post.readingTime}</span>
-              <span>·</span>
-              <span>{post.wordCount.toLocaleString()} words</span>
-            </div>
-          </header>
-
-          <AdSlot slot="1111111111" format="horizontal" className="mb-10" />
-
-          <div className="prose prose-lg dark:prose-invert max-w-none animate-fade-up animate-delay-100">
-            <MDXContent />
+        <div className="mt-12 max-w-4xl">
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {post.tags?.map((tag) => (
+              <span
+                key={tag}
+                className="font-mono text-[0.68rem] uppercase tracking-wider text-[var(--blue-deep)]"
+              >
+                {tag}
+              </span>
+            ))}
           </div>
 
-          <AdSlot slot="2222222222" format="horizontal" className="mt-10" />
-        </article>
+          <h1 className="mt-6 max-w-4xl font-display text-5xl font-semibold leading-[0.98] tracking-tight text-[var(--ink)] md:text-7xl lg:text-[5.5rem]">
+            {post.title}
+          </h1>
 
-        <aside className="space-y-6">
-          <div className="sticky top-24">
-            <AdSlot slot="3333333333" format="rectangle" className="mb-6" />
-            <div className="card p-4">
-              <p className="font-mono text-xs uppercase tracking-widest text-ink-faint dark:text-[#6A6A65] mb-3">
-                Post info
-              </p>
-              <div className="space-y-2 text-sm">
-                <div>
-                  <span className="text-ink-faint dark:text-[#6A6A65] font-mono text-xs">Published</span>
-                  <p className="text-ink dark:text-[#D4CFC8] mt-0.5">
-                    {format(new Date(post.date), 'MMM d, yyyy')}
-                  </p>
-                </div>
-                <div>
-                  <span className="text-ink-faint dark:text-[#6A6A65] font-mono text-xs">Reading time</span>
-                  <p className="text-ink dark:text-[#D4CFC8] mt-0.5">{post.readingTime}</p>
-                </div>
-              </div>
+          <p className="mt-8 max-w-2xl text-lg leading-8 text-[var(--ink-muted)] md:text-xl md:leading-9">
+            {post.description}
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[var(--line)] pt-5 font-mono text-[0.68rem] uppercase tracking-wider text-[var(--ink-faint)]">
+            <time dateTime={post.date}>
+              {format(new Date(post.date), 'MMMM d, yyyy')}
+            </time>
+
+            <span className="text-[var(--blue)]">/</span>
+
+            <span>{post.readingTime}</span>
+          </div>
+        </div>
+      </header>
+
+      <div className="border-t border-[var(--line)]">
+        <div className="site-container">
+          <div className="mx-auto max-w-[760px] py-14 md:py-20">
+            <div className="article-body">
+              <MDXContent />
             </div>
           </div>
-        </aside>
+        </div>
       </div>
-    </div>
+
+      <footer className="border-t border-[var(--line)]">
+        <div className="site-container py-14 md:py-20">
+          <div className="mx-auto max-w-[760px]">
+            <p className="eyebrow">Keep reading</p>
+
+            <Link href="/" className="group mt-5 block">
+              <span className="font-display text-3xl font-semibold tracking-tight text-[var(--ink)] transition-colors group-hover:text-[var(--blue-deep)] md:text-4xl">
+                More engineering notes
+              </span>
+
+              <span className="mt-3 block font-mono text-xs uppercase tracking-wider text-[var(--blue-deep)]">
+                Browse all writing ↗
+              </span>
+            </Link>
+          </div>
+        </div>
+      </footer>
+    </article>
   )
 }

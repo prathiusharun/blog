@@ -3,12 +3,16 @@ import { NextResponse } from 'next/server'
 export function GET() {
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
-    'https://prathiush-portfolio.vercel.app'
+    'https://prathiush-blog.vercel.app'
 
   return new NextResponse(
-    `User-agent: *\nAllow: /\nSitemap: ${siteUrl}/sitemap.xml`,
+    `User-agent: *
+Allow: /
+Sitemap: ${siteUrl}/sitemap.xml`,
     {
-      headers: { 'Content-Type': 'text/plain' },
+      headers: {
+        'Content-Type': 'text/plain',
+      },
     }
   )
 }
