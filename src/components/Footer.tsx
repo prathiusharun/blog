@@ -2,16 +2,44 @@ import Link from 'next/link'
 
 export function Footer() {
   return (
-    <footer className="border-t border-paper-dark dark:border-void-border mt-24">
-      <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="font-mono text-xs uppercase tracking-widest text-ink-faint dark:text-[#8A8A85]">
-          © {new Date().getFullYear()} Prathiush Arun — Full Stack Engineer
+    <footer className="border-t border-[var(--line)]">
+      <div className="site-container flex flex-col gap-5 py-10 sm:flex-row sm:items-center sm:justify-between">
+        <p className="font-mono text-xs uppercase tracking-wider text-[var(--ink-faint)]">
+          © {new Date().getFullYear()} Prathiush Arun
         </p>
-        <div className="flex items-center gap-5">
-          <a href="https://github.com/prathiusharun" target="_blank" rel="noopener noreferrer" className="nav-link">GitHub</a>
-          <a href="https://x.com/prathiusharun_" target="_blank" rel="noopener noreferrer" className="nav-link">Twitter</a>
-          <a href="https://medium.com/@prathiusharun" target="_blank" rel="noopener noreferrer" className="nav-link">Medium</a>
-          <Link href="/rss.xml" className="nav-link">RSS</Link>
+
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-3 font-mono text-xs uppercase tracking-wider text-[var(--ink-muted)]">
+          <a
+            href="https://github.com/prathiusharun"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-[var(--blue-deep)]"
+          >
+            GitHub
+          </a>
+
+          <a
+            href="https://substack.com/@prathiusharun"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-[var(--blue-deep)]"
+          >
+            Substack
+          </a>
+
+          <Link
+            href="/rss.xml"
+            className="transition-colors hover:text-[var(--blue-deep)]"
+          >
+            RSS
+          </Link>
+
+          <a
+            href="https://prathiusharun.vercel.app"
+            className="transition-colors hover:text-[var(--blue-deep)]"
+          >
+            Portfolio ↗
+          </a>
         </div>
       </div>
     </footer>

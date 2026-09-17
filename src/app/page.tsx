@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getAllPosts, getAllTags } from '@/lib/posts'
+import { getAllPosts } from '@/lib/posts'
 import { PostCard } from '@/components/PostCard'
 import Link from 'next/link'
 
@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   const posts = getAllPosts()
-  const tags = getAllTags().slice(0, 8)
   const [featured, ...rest] = posts
 
   return (
@@ -34,10 +33,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="site-container pb-20 md:pb-28">
-        <div className="editorial-rule" />
+      {featured && (
+        <section className="site-container pb-20 md:pb-28">
+          <div className="editorial-rule" />
 
-        {featured ? (
           <div className="pt-4">
             <div className="mb-4 flex items-center justify-between">
               <p className="eyebrow">Featured</p>
@@ -48,88 +47,64 @@ export default function HomePage() {
 
             <PostCard post={featured} featured />
           </div>
+        </section>
+      )}
+
+      <section
+        id="writing"
+        className="site-container scroll-mt-24 pb-20 md:pb-28"
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <p className="eyebrow">All writing</p>
+
+          <span className="font-mono text-xs text-[var(--ink-faint)]">
+            {String(posts.length).padStart(2, '0')} posts
+          </span>
+        </div>
+
+        {rest.length > 0 ? (
+          <div>
+            {rest.map((post, index) => (
+              <PostCard
+                key={post.slug}
+                post={post}
+                index={index + 2}
+              />
+            ))}
+          </div>
         ) : (
-          <div className="py-20">
+          <div className="border-y border-[var(--line)] py-12">
             <p className="font-mono text-sm text-[var(--ink-muted)]">
-              No posts yet.
+              More writing coming soon.
             </p>
           </div>
         )}
       </section>
 
-      {rest.length > 0 && (
-        <section className="site-container pb-20 md:pb-28">
-          <div className="mb-4 flex items-center justify-between">
-            <p className="eyebrow">All writing</p>
-            <span className="font-mono text-xs text-[var(--ink-faint)]">
-              {String(rest.length + 1).padStart(2, '0')} posts
-            </span>
-          </div>
-
-          <div>
-            {rest.map((post) => (
-              <PostCard key={post.slug} post={post} />
-            ))}
-          </div>
-        </section>
-      )}
-
       <section className="border-y border-[var(--line)] bg-[var(--blue-soft)]">
         <div className="site-container py-16 md:py-20">
           <div className="grid gap-10 md:grid-cols-[1fr_2fr]">
-            <div>
-              <p className="eyebrow">Topics</p>
-            </div>
+            <p className="eyebrow">About the writing</p>
 
-            <div>
-              <div className="flex flex-wrap gap-x-8 gap-y-4">
-                {tags.map(({ tag, count }) => (
-                  <Link
-                    key={tag}
-                    href={`/tags/${tag}`}
-                    className="font-display text-2xl font-semibold text-[var(--ink)] transition-colors hover:text-[var(--blue-deep)]"
-                  >
-                    {tag}
-                    <span className="ml-2 font-mono text-xs font-normal text-[var(--ink-faint)]">
-                      {count}
-                    </span>
-                  </Link>
-                ))}
-              </div>
+            <div className="max-w-2xl">
+              <h2 className="font-display text-3xl font-semibold leading-tight tracking-tight text-[var(--ink)] md:text-4xl">
+                I write about the engineering decisions behind the systems I
+                build.
+              </h2>
+
+              <p className="mt-5 text-base leading-8 text-[var(--ink-muted)]">
+                The useful parts of software engineering are often hidden
+                behind the final interface. These notes document the decisions,
+                tradeoffs, bugs and experiments that happen along the way.
+              </p>
 
               <Link
-                href="/tags"
-                className="mt-8 inline-block font-mono text-xs uppercase tracking-wider text-[var(--blue-deep)]"
+                href="https://prathiusharun.vercel.app"
+                className="mt-7 inline-block font-mono text-xs uppercase tracking-wider text-[var(--blue-deep)]"
               >
-                Browse all topics ↗
+                About Prathiush Arun ↗
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="site-container py-20 md:py-28">
-        <div className="grid gap-8 md:grid-cols-[1fr_2fr]">
-          <p className="eyebrow">About the writing</p>
-
-          <div className="max-w-2xl">
-            <h2 className="font-display text-3xl font-semibold leading-tight tracking-tight text-[var(--ink)] md:text-4xl">
-              I write about the engineering decisions behind the systems I
-              build.
-            </h2>
-
-            <p className="mt-5 text-base leading-8 text-[var(--ink-muted)]">
-              The useful parts of software engineering are often hidden behind
-              the final interface. These notes document the decisions,
-              tradeoffs, bugs and experiments that happen along the way.
-            </p>
-
-            <Link
-              href="https://prathiusharun.vercel.app"
-              className="mt-7 inline-block font-mono text-xs uppercase tracking-wider text-[var(--blue-deep)]"
-            >
-              About Prathiush Arun ↗
-            </Link>
           </div>
         </div>
       </section>

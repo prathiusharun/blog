@@ -5,9 +5,14 @@ import type { Post } from '@/lib/types'
 interface PostCardProps {
   post: Post
   featured?: boolean
+  index?: number
 }
 
-export function PostCard({ post, featured = false }: PostCardProps) {
+export function PostCard({
+  post,
+  featured = false,
+  index,
+}: PostCardProps) {
   return (
     <article
       className={`group ${
@@ -18,20 +23,21 @@ export function PostCard({ post, featured = false }: PostCardProps) {
     >
       <div className="grid gap-5 md:grid-cols-[72px_1fr] md:gap-8">
         <div className="font-mono text-xs tracking-wider text-[var(--ink-faint)]">
-          {featured ? '★' : format(new Date(post.date), '01')}
+          {featured
+            ? '★'
+            : String(index ?? 1).padStart(2, '0')}
         </div>
 
         <div>
           {post.tags?.length > 0 && (
             <div className="mb-3 flex flex-wrap gap-x-3 gap-y-1">
               {post.tags.slice(0, 3).map((tag) => (
-                <Link
+                <span
                   key={tag}
-                  href={`/tags/${tag}`}
                   className="font-mono text-[0.68rem] uppercase tracking-wider text-[var(--blue-deep)]"
                 >
                   {tag}
-                </Link>
+                </span>
               ))}
             </div>
           )}

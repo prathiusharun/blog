@@ -1,52 +1,31 @@
-import { MetadataRoute } from 'next'
-import { getAllPosts, getAllTags } from '@/lib/posts'
+import type { MetadataRoute } from 'next'
+import { getAllPosts } from '@/lib/posts'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = 'https://prathiush-portfolio.vercel.app'
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    'https://prathiusharun.vercel.app'
 
   const posts = getAllPosts()
-  const tags = getAllTags()
 
-  const staticRoutes: MetadataRoute.Sitemap = [
+  return [
     {
-      url: `${siteUrl}/`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: `${siteUrl}/blog`,
+      url: siteUrl,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.9,
+      priority: 1,
     },
     {
       url: `${siteUrl}/about`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
-      priority: 0.5,
+      priority: 0.7,
     },
-    {
-      url: `${siteUrl}/tags`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
+    ...posts.map((post) => ({
+      url: `${siteUrl}/posts/${post.slug}`,
+      lastModified: new Date(post.date),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
   ]
-
-  const postRoutes: MetadataRoute.Sitemap = posts.map((post) => ({
-    url: `${siteUrl}/posts/${post.slug}`,
-    lastModified: new Date(post.date),
-    changeFrequency: 'monthly',
-    priority: 0.8,
-  }))
-
-  const tagRoutes: MetadataRoute.Sitemap = tags.map(({ tag }) => ({
-    url: `${siteUrl}/tags/${tag}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly',
-    priority: 0.5,
-  }))
-
-  return [...staticRoutes, ...postRoutes, ...tagRoutes]
 }
