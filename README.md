@@ -1,4 +1,4 @@
-# Prathiush.dev
+# Prathiush Arun
 
 A production-grade personal blog built with Next.js 14 App Router, TypeScript, Tailwind CSS, and MDX. Designed as a complete content platform — not just a blog template — with SEO, monetization, containerization, and a full CI/CD pipeline.
 
