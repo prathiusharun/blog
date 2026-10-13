@@ -5,7 +5,7 @@ import { Footer } from '@/components/Footer'
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://prathiusharun.vercel.app'
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://prathiush-blog.vercel.app'
   ),
   title: {
     template: '%s | Prathiush Arun',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url:
       process.env.NEXT_PUBLIC_SITE_URL ||
-      'https://prathiusharun.vercel.app',
+      'https://prathiush-blog.vercel.app',
     siteName: 'Prathiush Arun',
     images: [{ url: '/og-default.png', width: 1200, height: 630 }],
   },
